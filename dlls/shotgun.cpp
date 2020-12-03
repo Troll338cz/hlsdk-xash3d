@@ -21,6 +21,7 @@
 #include "nodes.h"
 #include "player.h"
 #include "gamerules.h"
+#include "game.h"
 
 // special deathmatch shotgun spreads
 #define VECTOR_CONE_DM_SHOTGUN	Vector( 0.08716, 0.04362, 0.00 )// 10 degrees by 5 degrees
@@ -297,7 +298,9 @@ void CShotgun::Reload( void )
 	{
 		// Add them to the clip
 		m_iClip += 1;
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 1;
+		if(!endless.value){
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 1;
+		}
 		m_fInSpecialReload = 1;
 	}
 }
