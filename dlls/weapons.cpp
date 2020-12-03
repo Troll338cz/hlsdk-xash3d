@@ -30,6 +30,7 @@
 #include "soundent.h"
 #include "decals.h"
 #include "gamerules.h"
+#include "game.h"
 
 extern CGraph WorldGraph;
 extern int gEvilImpulse101;
@@ -611,7 +612,10 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 
 		// Add them to the clip
 		m_iClip += j;
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
+
+		if(!endless.value){
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= j;
+		}
 
 		m_pPlayer->TabulateAmmo();
 

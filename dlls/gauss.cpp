@@ -166,7 +166,9 @@ void CGauss::PrimaryAttack()
 	m_pPlayer->m_iWeaponVolume = GAUSS_PRIMARY_FIRE_VOLUME;
 	m_fPrimaryFire = TRUE;
 
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 2;
+	if(!endless.value){
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 2;
+	}
 
 	StartFire();
 	m_fInAttack = 0;
@@ -204,8 +206,9 @@ void CGauss::SecondaryAttack()
 		}
 
 		m_fPrimaryFire = FALSE;
-
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;// take one ammo just to start the spin
+		if(!endless.value){
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;// take one ammo just to start the spin
+		}
 		m_pPlayer->m_flNextAmmoBurn = UTIL_WeaponTimeBase();
 
 		// spin up
@@ -256,12 +259,16 @@ void CGauss::SecondaryAttack()
 			if( g_pGameRules->IsMultiplayer() )
 #endif
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+				if(!endless.value){
+					m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+				}
 				m_pPlayer->m_flNextAmmoBurn = UTIL_WeaponTimeBase() + 0.1f;
 			}
 			else
 			{
-				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+				if(!endless.value){
+					m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+				}
 				m_pPlayer->m_flNextAmmoBurn = UTIL_WeaponTimeBase() + 0.3f;
 			}
 		}

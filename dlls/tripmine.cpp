@@ -22,6 +22,7 @@
 #include "player.h"
 #include "effects.h"
 #include "gamerules.h"
+#include "game.h"
 
 #define	TRIPMINE_PRIMARY_VOLUME		450
 
@@ -454,9 +455,9 @@ void CTripmine::PrimaryAttack( void )
 			Vector angles = UTIL_VecToAngles( tr.vecPlaneNormal );
 
 			CBaseEntity::Create( "monster_tripmine", tr.vecEndPos + tr.vecPlaneNormal * 8.0f, angles, m_pPlayer->edict() );
-
-			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
-
+			if(!endless.value){
+				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+			}
 			// player "shoot" animation
 			m_pPlayer->SetAnimation( PLAYER_ATTACK1 );
 			
@@ -476,8 +477,13 @@ void CTripmine::PrimaryAttack( void )
 	{
 
 	}*/
-
-	m_flNextPrimaryAttack = GetNextAttackDelay( 0.3 );
+	if(!endless.value){
+		m_flNextPrimaryAttack = GetNextAttackDelay( 0.3 );
+	}
+	else
+	{
+		m_flNextPrimaryAttack = GetNextAttackDelay( 1.0 );
+	}
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat( m_pPlayer->random_seed, 10, 15 );
 }
 

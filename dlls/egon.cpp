@@ -23,7 +23,7 @@
 #include "nodes.h"
 #include "effects.h"
 #include "customentity.h"
-#include "gamerules.h"
+#include "game.h"
 
 #define	EGON_PRIMARY_VOLUME		450
 #define EGON_BEAM_SPRITE		"sprites/xbeam1.spr"
@@ -152,9 +152,15 @@ BOOL CEgon::HasAmmo( void )
 void CEgon::UseAmmo( int count )
 {
 	if( m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= count )
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= count;
+	{
+		if(!endless.value){
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= count;
+		}
+	}
 	else
+	{
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 0;
+	}
 }
 
 void CEgon::Attack( void )
@@ -258,16 +264,13 @@ void CEgon::Fire( const Vector &vecOrigSrc, const Vector &vecDir )
 	if( pEntity == NULL )
 		return;
 
-	if( g_pGameRules->IsMultiplayer() )
+	if( m_pSprite && pEntity->pev->takedamage )
 	{
-		if( m_pSprite && pEntity->pev->takedamage )
-		{
-			m_pSprite->pev->effects &= ~EF_NODRAW;
-		}
-		else if( m_pSprite )
-		{
-			m_pSprite->pev->effects |= EF_NODRAW;
-		}
+		m_pSprite->pev->effects &= ~EF_NODRAW;
+	}
+	else if( m_pSprite )
+	{
+		m_pSprite->pev->effects |= EF_NODRAW;
 	}
 #endif
 	float timedist = 0.0f;
@@ -286,25 +289,13 @@ void CEgon::Fire( const Vector &vecOrigSrc, const Vector &vecDir )
 			}
 			ApplyMultiDamage( m_pPlayer->pev, m_pPlayer->pev );
 
-			if( g_pGameRules->IsMultiplayer() )
-			{
-				// multiplayer uses 1 ammo every 1/10th second
-				if( gpGlobals->time >= m_flAmmoUseTime )
-				{
-					UseAmmo( 1 );
-					m_flAmmoUseTime = gpGlobals->time + 0.1f;
-				}
-			}
-			else
-			{
-				// single player, use 3 ammo/second
-				if( gpGlobals->time >= m_flAmmoUseTime )
-				{
-					UseAmmo( 1 );
-					m_flAmmoUseTime = gpGlobals->time + 0.166f;
-				}
-			}
 
+			// multiplayer uses 1 ammo every 1/10th second
+			if( gpGlobals->time >= m_flAmmoUseTime )
+			{
+				UseAmmo( 1 );
+				m_flAmmoUseTime = gpGlobals->time + 0.1f;
+			}
 			pev->dmgtime = gpGlobals->time + GetPulseInterval();
 		}
 #endif
@@ -318,37 +309,23 @@ void CEgon::Fire( const Vector &vecOrigSrc, const Vector &vecDir )
 			ClearMultiDamage();
 			if( pEntity->pev->takedamage )
 			{
-				pEntity->TraceAttack( m_pPlayer->pev, gSkillData.plrDmgEgonWide, vecDir, &tr, DMG_ENERGYBEAM | DMG_ALWAYSGIB );
+				pEntity->TraceAttack( m_pPlayer->pev, 2, vecDir, &tr, DMG_ENERGYBEAM | DMG_ALWAYSGIB );
 			}
 			ApplyMultiDamage( m_pPlayer->pev, m_pPlayer->pev );
 
-			if( g_pGameRules->IsMultiplayer() )
-			{
-				// radius damage a little more potent in multiplayer.
-				::RadiusDamage( tr.vecEndPos, pev, m_pPlayer->pev, gSkillData.plrDmgEgonWide * 0.25f, 128, CLASS_NONE, DMG_ENERGYBEAM | DMG_BLAST | DMG_ALWAYSGIB );
-			}
+			// radius damage a little more potent in multiplayer.
+			::RadiusDamage( tr.vecEndPos, pev, m_pPlayer->pev, 2, 128, CLASS_NONE, DMG_ENERGYBEAM | DMG_BLAST | DMG_ALWAYSGIB );
 
 			if( !m_pPlayer->IsAlive() )
 				return;
 
-			if( g_pGameRules->IsMultiplayer() )
+			//multiplayer uses 5 ammo/second
+			if( gpGlobals->time >= m_flAmmoUseTime )
 			{
-				//multiplayer uses 5 ammo/second
-				if( gpGlobals->time >= m_flAmmoUseTime )
-				{
-					UseAmmo( 1 );
-					m_flAmmoUseTime = gpGlobals->time + 0.2f;
-				}
+				UseAmmo( 1 );
+				m_flAmmoUseTime = gpGlobals->time + 0.2f;
 			}
-			else
-			{
-				// Wide mode uses 10 charges per second in single player
-				if( gpGlobals->time >= m_flAmmoUseTime )
-				{
-					UseAmmo( 1 );
-					m_flAmmoUseTime = gpGlobals->time + 0.1f;
-				}
-			}
+
 
 			pev->dmgtime = gpGlobals->time + GetDischargeInterval();
 			if( m_shakeTime < gpGlobals->time )

@@ -453,6 +453,8 @@ cvar_t	sk_player_leg3	= { "sk_player_leg3","1" };
 
 // END Cvars for Skill Level settings
 
+cvar_t endless		= { "mp_endless", "1", FCVAR_SERVER };
+
 // Register your console variables here
 // This gets called one time when the game is initialied
 void GameDLLInit( void )
@@ -460,6 +462,8 @@ void GameDLLInit( void )
 	// Register cvars here:
 	if( CVAR_GET_POINTER( "build" ) )
 		g_fIsXash3D = TRUE;
+
+	CVAR_REGISTER( &endless );
 
 	g_psv_gravity = CVAR_GET_POINTER( "sv_gravity" );
 	g_psv_aim = CVAR_GET_POINTER( "sv_aim" );
