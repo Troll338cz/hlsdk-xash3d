@@ -455,6 +455,38 @@ void CWorld::Spawn( void )
 {
 	g_fGameOver = FALSE;
 	Precache();
+	pev->nextthink = gpGlobals->time + 60; 
+}
+
+
+void CWorld::Think( void )
+{
+	CBaseEntity *RemoveCrap = NULL;
+	CBaseEntity *RemoveCrap1 = NULL;
+	CBaseEntity *RemoveCrap2 = NULL;
+	while( ( RemoveCrap = UTIL_FindEntityInSphere( RemoveCrap, Vector(0, 0, 0), 8992 ) ) != NULL )
+	{
+		if( FClassnameIs( RemoveCrap->pev, "weaponbox" ) )
+		{
+			UTIL_Remove( RemoveCrap );
+		}
+	}
+	while( ( RemoveCrap1 = UTIL_FindEntityInSphere( RemoveCrap1, Vector(0, 0, 0), 8992 ) ) != NULL )
+	{
+		if( FClassnameIs( RemoveCrap1->pev, "monster_satchel" ) )
+		{
+			UTIL_Remove( RemoveCrap1 );
+		}
+	}
+	while( ( RemoveCrap2 = UTIL_FindEntityInSphere( RemoveCrap2, Vector(0, 0, 0), 8992 ) ) != NULL )
+	{
+		if( FClassnameIs( RemoveCrap2->pev, "monster_tripmine" ) )
+		{
+			UTIL_Remove( RemoveCrap2 );
+		}
+	}
+
+	pev->nextthink = gpGlobals->time + 60;
 }
 
 void CWorld::Precache( void )
