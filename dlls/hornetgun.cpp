@@ -23,6 +23,7 @@
 #include "player.h"
 #include "hornet.h"
 #include "gamerules.h"
+#include "game.h"
 
 enum hgun_e
 {
@@ -139,8 +140,10 @@ void CHgun::PrimaryAttack()
 
 	m_flRechargeTime = gpGlobals->time + 0.5f;
 #endif
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
-	
+
+	if(!endless.value){
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	}	
 	m_pPlayer->m_iWeaponVolume = QUIET_GUN_VOLUME;
 	m_pPlayer->m_iWeaponFlash = DIM_GUN_FLASH;
 
@@ -154,9 +157,13 @@ void CHgun::PrimaryAttack()
 
 	// player "shoot" animation
 	m_pPlayer->SetAnimation( PLAYER_ATTACK1 );
-
-	m_flNextPrimaryAttack = m_flNextPrimaryAttack + 0.25f;
-
+	if(!endless.value){
+		m_flNextPrimaryAttack = m_flNextPrimaryAttack + 0.25f;
+	}
+	else
+	{
+		m_flNextPrimaryAttack = m_flNextPrimaryAttack + 0.4f;
+	}
 	if( m_flNextPrimaryAttack < UTIL_WeaponTimeBase() )
 	{
 		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.25f;
@@ -232,15 +239,22 @@ void CHgun::SecondaryAttack( void )
 	flags = 0;
 #endif
 	PLAYBACK_EVENT_FULL( flags, m_pPlayer->edict(), m_usHornetFire, 0.0f, g_vecZero, g_vecZero, 0.0f, 0.0f, FIREMODE_FAST, 0, 0, 0 );
-
-	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	if(!endless.value){
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	}
 	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
 	m_pPlayer->m_iWeaponFlash = DIM_GUN_FLASH;
 
 	// player "shoot" animation
 	m_pPlayer->SetAnimation( PLAYER_ATTACK1 );
+	if(!endless.value){
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.1f;
+	}
+	else
+	{
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3f;
+	}
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.1f;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat( m_pPlayer->random_seed, 10.0f, 15.0f );
 }
 
