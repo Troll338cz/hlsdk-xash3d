@@ -22,6 +22,7 @@
 #include "player.h"
 #include "soundent.h"
 #include "gamerules.h"
+#include "game.h"
 
 enum mp5_e
 {
@@ -207,7 +208,9 @@ void CMP5::SecondaryAttack( void )
 	m_pPlayer->m_iExtraSoundTypes = bits_SOUND_DANGER;
 	m_pPlayer->m_flStopExtraSoundTime = UTIL_WeaponTimeBase() + 0.2f;
 
-	m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
+	if(!endless.value){
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
+	}
 
 	// player "shoot" animation
 	m_pPlayer->SetAnimation( PLAYER_ATTACK1 );
@@ -226,9 +229,15 @@ void CMP5::SecondaryAttack( void )
 	flags = 0;
 #endif
 	PLAYBACK_EVENT( flags, m_pPlayer->edict(), m_usMP52 );
-
-	m_flNextPrimaryAttack = GetNextAttackDelay( 1.0f );
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0f;
+	if(!endless.value){
+		m_flNextPrimaryAttack = GetNextAttackDelay( 1.0f );
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0f;
+	}
+	else
+	{
+		m_flNextPrimaryAttack = GetNextAttackDelay( 1.2f );
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.5f;
+	}
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 5.0f;// idle pretty soon after shooting.
 
 	if( !m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] )
