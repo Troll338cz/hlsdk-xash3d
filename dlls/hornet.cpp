@@ -101,7 +101,7 @@ void CHornet::Spawn( void )
 
 	if( !FNullEnt( pev->owner ) && ( pev->owner->v.flags & FL_CLIENT ) )
 	{
-		pev->dmg = gSkillData.plrDmgHornet;
+		pev->dmg = 7;
 	}
 	else
 	{
